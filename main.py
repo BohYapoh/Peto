@@ -13,25 +13,27 @@ g = 9.81
 C = 0.0022
 dt = 0.01
 
-t = np.linspace(0, 5, 501)
+t = np.linspace(0, 20, 2001)
 y = np.zeros((len(t)))
 v = np.zeros((len(t)))
 a = np.zeros((len(t)))
 y[0]=500
-
+y_pos = 0
 def f(t, v):
     return -g-C*v*abs(v)
 
 def move_circle( index ):
-    if index < len(t):
-        y_pos = -y[index] + 530
-        simulation.coords(gosling_obj, 50, y_pos)
+    if index < len(t)-1:
+        y_pos = -y[index] + 550
+        if y_pos <760:
+            simulation.coords(gosling_obj, 50, y_pos)
         t_int = int(dt*1000)
         now = time.perf_counter()
         delta = now - start_time
-        print (delta)
-        print (y[index])
-        print (index)
+        if int(y_pos) % 100 == 0:
+            print (int(y_pos), " ", delta)
+        index = int(100*delta)
+
         root.after(t_int, lambda : move_circle(index+1))
 
 
