@@ -4,6 +4,7 @@ import tkinter as tk
 import numpy as np
 import time
 import PIL
+import pygame
 from PIL import Image, ImageTk
 print("Hello world")
 
@@ -17,7 +18,7 @@ t = np.linspace(0, 20, 2001)
 y = np.zeros((len(t)))
 v = np.zeros((len(t)))
 a = np.zeros((len(t)))
-y[0]=500
+y[0] = 500
 y_pos = 0
 
 i=0
@@ -27,6 +28,65 @@ k_1 = 0
 k_2 = 0
 k_3 = 0
 k_4 = 0
+
+class Svin:
+    def __init__(self):
+        self.transp = False
+        self.x_pos = 150
+        self.y_pos = 700
+        self.edet_right = False
+        self.edet_left = False
+        self.img = Image.open("Svin.png")
+        self.small_Svin = self.img.resize((300, 200))
+        self.Tk_small_Svin = ImageTk.PhotoImage(self.small_Svin)
+        self.svin_obj = simulation.create_image(self.x_pos, self.y_pos, image=self.Tk_small_Svin)
+
+    def rotate(self, a):
+        if a == 0 and self.edet_right == True:
+            self.img = Image.open("Svin.png")
+            self.small_Svin = self.img.resize((300, 200))
+            self.Tk_small_Svin = ImageTk.PhotoImage(self.small_Svin)
+            self.svin_obj = simulation.create_image(self.x_pos, self.y_pos, image=self.Tk_small_Svin)
+        if a == 1 and self.edet_left == True:
+            self.img = self.img.transpose(Image.FLIP_LEFT_RIGHT)
+            self.small_Svin = self.img.resize((300, 200))
+            self.Tk_small_Svin = ImageTk.PhotoImage(self.small_Svin)
+            self.svin_obj = simulation.create_image(self.x_pos, self.y_pos, image=self.Tk_small_Svin)
+
+    def start_move_right(self, event):
+        if self.edet_right == False:
+            print("начинаем")
+            self.edet_right = True
+            self.move_right()
+            self.rotate(0)
+
+    def end_move_right(self, event):
+        print("кончаем")
+        self.edet_right = False
+
+    def move_right(self):
+
+        if self.edet_right == True:
+            self.x_pos += 10
+            simulation.coords(self.svin_obj, self.x_pos, self.y_pos)
+            root.after(20, lambda : self.move_right())
+
+    def start_move_left(self, event):
+        if self.edet_left == False:
+            self.orient = 1
+            self.edet_left = True
+            self.rotate(1)
+            self.move_left()
+
+    def end_move_left(self, event):
+        self.edet_left = False
+
+    def move_left(self):
+        if self.edet_left == True:
+            self.x_pos -= 10
+            simulation.coords(self.svin_obj, self.x_pos, self.y_pos)
+            root.after(20, lambda : self.move_left())
+
 
 def f(t, v):
     return -g-C*v*abs(v)
@@ -58,6 +118,10 @@ def move_circle( index ):
 
         root.after(t_int, lambda : move_circle(index+1))
 
+
+def key_check(event):
+    print(f"Нажата: {event.char}")
+
 print(t[500])
 print(v[1])
 
@@ -77,7 +141,23 @@ gosling_ball = Image.open("Gosling.png")
 small_gosling_ball = gosling_ball.resize((80,80))
 Tk_small_gosling_ball = ImageTk.PhotoImage(small_gosling_ball)
 gosling_obj = simulation.create_image(100, 100, image = Tk_small_gosling_ball)
+
 start_time = time.perf_counter()
 move_circle(0)
-print("Hello world")
+Car1 = Svin()
+root.bind("<Key>", key_check)
+root.bind("<KeyPress-D>", Car1.start_move_right)
+root.bind("<KeyRelease-D>", Car1.end_move_right)
+root.bind("<KeyPress-d>", Car1.start_move_right)
+root.bind("<KeyRelease-d>", Car1.end_move_right)
+root.bind("<KeyPress-A>", Car1.start_move_left)
+root.bind("<KeyRelease-A>", Car1.end_move_left)
+root.bind("<KeyPress-a>", Car1.start_move_left)
+root.bind("<KeyRelease-a>", Car1.end_move_left)
+
+pygame.mixer.init()
+pygame.mixer.music.load("Nightcall.mp3")
+pygame.mixer.music.play(-1)
+root.focus_set()
 root.mainloop()
+print("Hello world")
