@@ -7,6 +7,8 @@ import PIL
 import pygame
 import arcade
 import random
+import sys
+import os
 from PIL import Image, ImageTk
 from pygame.transform import rotate
 
@@ -35,12 +37,18 @@ k_4 = 0
 
 gosling_time = 0
 
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 class GG (arcade.Window):
 
     def __init__(self, width, height):
         super().__init__(width, height)
-        self.background = arcade.Sprite("Landscape.png", scale = 0.78125)
+        self.background = arcade.Sprite(resource_path("assets/Landscape.png"), scale = 0.78125)
         self.background.center_x = 600
         self.background.center_y = 400
         self.sprite_list = arcade.SpriteList()
@@ -95,7 +103,7 @@ class Svin(arcade.Sprite):
     def __init__(self):
         self.right1 = False
         self.left1 = False
-        super().__init__("Svin.png", scale=1)
+        super().__init__(resource_path("assets/Svin.png"), scale=1)
         self.original_texture = self.texture
         self.flipped_texture = self.texture.flip_left_right()
         self.center_x = 150
@@ -162,7 +170,7 @@ def f(t, v):
 class Gosling(arcade.Sprite):
 
     def __init__ (self, n):
-        super().__init__("Gosling.png", scale=1)
+        super().__init__(resource_path("assets/Gosling.png"), scale=1)
         self.start_time = time.perf_counter()
         self.center_x = random.randint(0, 1200)
         self.center_y = 800
@@ -200,7 +208,7 @@ print(v[1])
 
 
 pygame.mixer.init()
-pygame.mixer.music.load("Nightcall.mp3")
+pygame.mixer.music.load(resource_path("assets/Nightcall.mp3"))
 pygame.mixer.music.play(-1)
 
 game = GG(1200, 800)
